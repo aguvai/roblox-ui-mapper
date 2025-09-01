@@ -123,11 +123,32 @@ local function clearGUIs()
 	end
 end
 
+
+-- // References
 local tweenPreferences = preferences.tweenPreferences
 local openTween = tweenPreferences.openTween
 local closeTween = tweenPreferences.closeTween
+
+-- // Close function
+local closingDebounce = false
+local function closeGUI(mainFrame)
+	if not mainFrame.Visible then return end
+	if closingDebounce then return end
+	closingDebounce = true
+
+	mainFrame:TweenPosition(preferences.UI_closedPosition, closeTween.easingDirection, closeTween.easingStyle, closeTween.time, true)
+	task.wait(closeTween.time)
+
+	mainFrame.Visible = false
+	closingDebounce = false
+end
+
+-- // Open function
 local function openGUI(mainFrame)
-	if mainFrame.Visible then return end
+	if mainFrame.Visible then 
+		closeGUI(mainFrame)
+		return
+	end
 
 	clearGUIs()
 	mainFrame.Visible = true
@@ -135,7 +156,6 @@ local function openGUI(mainFrame)
 end
 
 -- // open/close
-local closingDebounce = false
 for index, gui in pairs (guiMap) do
 	
 	local openButton = gui.openButton
@@ -165,15 +185,7 @@ for index, gui in pairs (guiMap) do
 	
 	-- // 3. Close Button
 	closeButton.MouseButton1Click:Connect(function()
-		if not mainFrame.Visible then return end
-		if closingDebounce then return end
-		closingDebounce = true
-		
-		mainFrame:TweenPosition(preferences.UI_closedPosition, closeTween.easingDirection, closeTween.easingStyle, closeTween.time, true)
-		task.wait(closeTween.time)
-		
-		mainFrame.Visible = false
-		closingDebounce = false
+		closeGUI(mainFrame)
 	end)
 	
 end

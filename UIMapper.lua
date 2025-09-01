@@ -31,14 +31,23 @@ local preferences = {
 		associatedOpenPrompts_name = "associatedOpenPrompts",
 	},
 	
-	UI_openTween = {
-		time = .3,
-		easingStyle = Enum.EasingStyle.Quart,
-		easingDirection = Enum.EasingDirection.Out,
+	tweenPreferences = {
+		openTween = {
+			time = .3,
+			easingStyle = Enum.EasingStyle.Quart,
+			easingDirection = Enum.EasingDirection.Out,
+		},
+
+		closeTween = {
+			time = .3,
+			easingStyle = Enum.EasingStyle.Quart,
+			easingDirection = Enum.EasingDirection.In,
+		},
 	},
 	
 	UI_closedPosition = UDim2.new(0.5, 0, -1.5, 0),
 	UI_openedPosition = UDim2.new(0.5, 0, 0.5, 0),
+	
 }
 
 -- [[ Store button-to-GUI mappings ]] --
@@ -112,14 +121,14 @@ for _, holder in ipairs (buttonHolder:GetChildren()) do
 		if gui then
 
 			mapGUIToContentsFromButton(gui, button)
-
+		else
+			
 		end
 	end
 end
 
 
 -- [[ NORMALIZE UI ON GAME START ]] --
-
 coroutine.wrap(function()
 	for index, gui in pairs (guiMap) do
 		gui.mainFrame.Position = preferences.UI_closedPosition
@@ -130,6 +139,7 @@ end)()
 
 -- [[ OPEN/CLOSE GUI FUNCTIONS ]] --
 
+-- // Helpers
 local function clearGUIs()
 	for _, gui in pairs(guiMap) do
 		gui.mainFrame.Visible = false
@@ -137,14 +147,60 @@ local function clearGUIs()
 	end
 end
 
-local tweenPreferences = preferences.UI_openTween
 
+-- // open/close
+local tweenPreferences = preferences.tweenPreferences
+local openTween = tweenPreferences.openTween
+local closeTween = tweenPreferences.closeTween
+
+local function openGUI(mainFrame)
+	if mainFrame.Visible then return end
+
+	clearGUIs()
+	mainFrame.Visible = true
+	mainFrame:TweenPosition(preferences.UI_openedPosition, openTween.easingDirection, openTween.easingStyle, openTween.time, true)
+end
+
+
+local closingDebounce = false
 for index, gui in pairs (guiMap) do
-	gui.openButton.MouseButton1Click:Connect(function()
-		if gui.mainFrame.Visible then return end
-		
-		clearGUIs()
-		gui.mainFrame.Visible = true
-		gui.mainFrame:TweenPosition(preferences.UI_openedPosition, tweenPreferences.easingDirection, tweenPreferences.easingStyle, tweenPreferences.time, true)
+	
+	local openButton = gui.openButton
+	local closeButton = gui.closeButton
+	local associatedPrompts = gui.associatedOpenPrompts
+	local mainFrame = gui.mainFrame
+	
+	-- // 1. Open Button
+	openButton.MouseButton1Click:Connect(function()
+		openGUI(mainFrame)
 	end)
+	
+	openButton.MouseEnter:Connect(function()
+		
+	end)
+	
+	openButton.MouseLeave:Connect(function()
+		
+	end)
+	
+	-- // 2. Associated Open Prompts
+	for _, prompt in pairs (gui.associatedOpenPrompts) do
+		prompt.Triggered:Connect(function()
+			openGUI(mainFrame)
+		end)
+	end
+	
+	-- // 3. Close Button
+	closeButton.MouseButton1Click:Connect(function()
+		if not mainFrame.Visible then return end
+		if closingDebounce then return end
+		closingDebounce = true
+		
+		mainFrame:TweenPosition(preferences.UI_closedPosition, closeTween.easingDirection, closeTween.easingStyle, closeTween.time, true)
+		task.wait(closeTween.time)
+		
+		mainFrame.Visible = false
+		closingDebounce = false
+	end)
+	
 end

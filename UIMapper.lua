@@ -147,12 +147,9 @@ local function clearGUIs()
 	end
 end
 
-
--- // open/close
 local tweenPreferences = preferences.tweenPreferences
 local openTween = tweenPreferences.openTween
 local closeTween = tweenPreferences.closeTween
-
 local function openGUI(mainFrame)
 	if mainFrame.Visible then return end
 
@@ -161,7 +158,7 @@ local function openGUI(mainFrame)
 	mainFrame:TweenPosition(preferences.UI_openedPosition, openTween.easingDirection, openTween.easingStyle, openTween.time, true)
 end
 
-
+-- // open/close
 local closingDebounce = false
 for index, gui in pairs (guiMap) do
 	

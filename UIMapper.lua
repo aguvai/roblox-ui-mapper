@@ -32,12 +32,13 @@ local preferences = {
 	},
 	
 	UI_openTween = {
-		time = .25,
+		time = .3,
 		easingStyle = Enum.EasingStyle.Quart,
-		easingDirection = Enum.EasingDirection.InOut,
+		easingDirection = Enum.EasingDirection.Out,
 	},
 	
-	UI_restingPosition = UDim2.new(0.5, 0, -1.5, 0),
+	UI_closedPosition = UDim2.new(0.5, 0, -1.5, 0),
+	UI_openedPosition = UDim2.new(0.5, 0, 0.5, 0),
 }
 
 -- [[ Store button-to-GUI mappings ]] --
@@ -117,12 +118,22 @@ for _, holder in ipairs (buttonHolder:GetChildren()) do
 end
 
 
+-- [[ NORMALIZE UI ON GAME START ]] --
+
+coroutine.wrap(function()
+	for index, gui in pairs (guiMap) do
+		gui.mainFrame.Position = preferences.UI_closedPosition
+		gui.mainFrame.Visible = false
+	end
+end)()
+
+
 -- [[ OPEN/CLOSE GUI FUNCTIONS ]] --
 
 local function clearGUIs()
 	for _, gui in pairs(guiMap) do
 		gui.mainFrame.Visible = false
-		gui.mainFrame.Position = preferences.UI_restingPosition
+		gui.mainFrame.Position = preferences.UI_closedPosition
 	end
 end
 
@@ -134,6 +145,6 @@ for index, gui in pairs (guiMap) do
 		
 		clearGUIs()
 		gui.mainFrame.Visible = true
-		gui.mainFrame:TweenPosition(UDim2.new(0.5, 0, 0.5, 0), tweenPreferences.easingDirection, tweenPreferences.easingStyle, tweenPreferences.time, true)
+		gui.mainFrame:TweenPosition(preferences.UI_openedPosition, tweenPreferences.easingDirection, tweenPreferences.easingStyle, tweenPreferences.time, true)
 	end)
 end

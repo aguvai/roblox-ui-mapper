@@ -9,6 +9,7 @@ local buttonHolder = playerGUI:WaitForChild("ButtonHolder")
 local modules = game.ReplicatedStorage.UIHandling
 local Preferences = require(modules.UIPreferences)
 local AnimationFunctions = require(modules.AnimationFunctions)
+local GUIMapper = require(modules.GUIMapper)
 
 ---------------------------------------------------------------------
 -- [[ SCREENGUI REFERENCES ]] --
@@ -29,78 +30,8 @@ local AnimationFunctions = require(modules.AnimationFunctions)
 ---------------------------------------------------------------------
 
 -- [[ Store button-to-GUI mappings ]] --
-local guiMap = {}
 
-local function mapGUIToContentsFromButton(gui, button)
-
-	if not button:IsA("ImageButton") or not button:IsA("TextButton") then
-		for _, v in pairs (button:GetDescendants()) do
-			if v:IsA("ImageButton") or v:IsA("TextButton") then
-				button = v
-				break
-			end
-		end
-	end
-
-	local mainframe
-	local closebutton
-	local associatedPrompts = {}
-
-	for _, descendant in gui:GetDescendants() do
-
-		-- // 1. Check for mainframe
-		if descendant.Name:lower() == Preferences.naming_rules.mainFrame_name:lower() then 
-			mainframe = descendant
-
-		-- // 2. Check for close button
-		elseif descendant.Name:lower() == Preferences.naming_rules.closeButton_name:lower() then 
-			closebutton = descendant
-
-		-- // 3. Check for associated open prompts
-		elseif descendant.Name:lower() == Preferences.naming_rules.associatedOpenPrompts_name:lower() then 
-			if not descendant:IsA("Folder") then
-				warn("AssociatedOpenPrompts must be a folder")
-				continue
-			end
-
-			for _, prompt in ipairs(descendant:GetChildren()) do
-				-- Validate folder contents
-				if not prompt:IsA("ObjectValue") then
-					warn("Only ObjectValues can be stored in AssociatedOpenPrompts")
-					continue
-				end
-				
-				local objValue = prompt -- your ObjectValue instance
-
-				-- Wait until Value is set
-				if not objValue.Value then
-					objValue:GetPropertyChangedSignal("Value"):Wait()
-				end
-
-				if not objValue.Value:IsA("ProximityPrompt") then
-					warn("ObjectValue in AssociatedOpenPrompts must reference a ProximityPrompt")
-				end
-
-				-- Store reference
-				table.insert(associatedPrompts, prompt.Value)
-			end
-		end
-		
-	end
-
-	-- Complete mapping
-	if mainframe and closebutton then
-		guiMap[gui] = {
-			openButton = button,
-			closeButton = closebutton,
-			mainFrame = mainframe,
-			associatedOpenPrompts = associatedPrompts,
-		}
-	else
-		warn("Missing MainFrame or GUICloseButton in GUI: " .. gui.Name)
-	end
-
-end
+GUIMap = nil
 
 for _, holder in ipairs (buttonHolder:GetChildren()) do
 	for _, button in ipairs (holder:GetChildren()) do
@@ -108,9 +39,10 @@ for _, holder in ipairs (buttonHolder:GetChildren()) do
 
 		local gui = playerGUI:FindFirstChild(guiName)
 		if gui then
-
-			mapGUIToContentsFromButton(gui, button)
+			GUIMapper.mapGUIToContentsFromButton(gui, button)
+			GUIMap = GUIMapper:getMap()
 		else
+			-- If we can't link a button to a GUI, we handle it differently
 			
 		end
 	end
@@ -119,7 +51,7 @@ end
 
 -- [[ NORMALIZE UI ON GAME START ]] --
 coroutine.wrap(function()
-	for index, gui in pairs (guiMap) do
+	for index, gui in pairs (GUIMap) do
 		gui.mainFrame.Position = Preferences.UI_closedPosition
 		gui.mainFrame.Visible = false
 	end
@@ -130,7 +62,7 @@ end)()
 
 -- // Helpers
 local function clearGUIs()
-	for _, gui in pairs(guiMap) do
+	for _, gui in pairs(GUIMap) do
 		gui.mainFrame.Visible = false
 		gui.mainFrame.Position = Preferences.UI_closedPosition
 	end
@@ -169,7 +101,7 @@ local function openGUI(mainFrame)
 end
 
 -- // open/close
-for index, gui in pairs (guiMap) do
+for index, gui in pairs (GUIMap) do
 	
 	local openButton = gui.openButton
 	local closeButton = gui.closeButton

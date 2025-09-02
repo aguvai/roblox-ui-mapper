@@ -8,16 +8,20 @@ function GUIMapper.getMap()
 	return guiMap
 end
 
-function GUIMapper.mapGUIToContentsFromButton(gui, button)
-
+function GUIMapper.validateButton(button)
 	if not (button:IsA("ImageButton") or button:IsA("TextButton")) then
 		for _, v in pairs (button:GetDescendants()) do
 			if v:IsA("ImageButton") or v:IsA("TextButton") then
-				button = v
-				break
+				return v
 			end
 		end
 	end
+	return button
+end
+
+function GUIMapper.mapGUIToContentsFromButton(gui, button)
+
+	button = GUIMapper.validateButton(button)
 
 	local mainframe
 	local closebutton

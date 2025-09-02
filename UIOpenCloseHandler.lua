@@ -10,6 +10,7 @@ local modules = game.ReplicatedStorage.UIHandling
 local Preferences = require(modules.UIPreferences)
 local AnimationFunctions = require(modules.AnimationFunctions)
 local GUIMapper = require(modules.GUIMapper)
+local SpecialButtonFunctions = require(modules.SpecialButtonFunctions)
 
 ---------------------------------------------------------------------
 -- [[ SCREENGUI REFERENCES ]] --
@@ -43,7 +44,10 @@ for _, holder in ipairs (buttonHolder:GetChildren()) do
 			GUIMap = GUIMapper:getMap()
 		else
 			-- If we can't link a button to a GUI, we handle it differently
-			
+			local handled = SpecialButtonFunctions:handle(button)
+			if not handled then
+				warn(string.format("No GUI or special action defined for button '%s'", button.Name))
+			end
 		end
 	end
 end

@@ -1,24 +1,4 @@
-local function hoverEnter(button)
-	local innerCircle = button.Parent.InnerCircle
-	innerCircle:TweenSize(
-		UDim2.new(0.95, 0, 0.95, 0),
-		Enum.EasingDirection.InOut,
-		Enum.EasingStyle.Quart,
-		.2,
-		true
-	)
-end
-
-local function hoverLeave(button)
-	local innerCircle = button.Parent.InnerCircle
-	innerCircle:TweenSize(
-		UDim2.new(0.8, 0, 0.8, 0),
-		Enum.EasingDirection.InOut,
-		Enum.EasingStyle.Quart,
-		.2,
-		true
-	)
-end
+local AnimationFunctions = require(script.Parent.AnimationFunctions)
 
 local UIPreferences = {
 	naming_rules = {
@@ -43,9 +23,16 @@ local UIPreferences = {
 	UI_closedPosition = UDim2.new(0.5, 0, -1.5, 0),
 	UI_openedPosition = UDim2.new(0.5, 0, 0.5, 0),
 
-	buttonHoverFunctions = {
-		enter = hoverEnter,
-		leave = hoverLeave,
+	hoverFunctions = {
+		openButton = {
+			enter = AnimationFunctions.open_hoverEnter,
+			leave = AnimationFunctions.open_hoverLeave,
+		},
+		
+		closeButton = {
+			enter = AnimationFunctions.close_hoverEnter,
+			leave = AnimationFunctions.close_hoverLeave,
+		}
 	},
 }
 

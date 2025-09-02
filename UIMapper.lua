@@ -1,8 +1,14 @@
 -- [[ SERVICES ]] --
 local TweenService = game:GetService("TweenService")
 
+-- [[ VARIABLES ]] --
 local playerGUI = script.Parent
 local buttonHolder = playerGUI:WaitForChild("ButtonHolder")
+
+-- [[ MODULES ]] --
+local modules = game.ReplicatedStorage.UIHandling
+local Preferences = require(modules.UIPreferences)
+local AnimationFunctions = require(modules.AnimationFunctions)
 
 ---------------------------------------------------------------------
 -- [[ SCREENGUI REFERENCES ]] --
@@ -21,10 +27,6 @@ local buttonHolder = playerGUI:WaitForChild("ButtonHolder")
 	* Names are not case sensitive
 --]]
 ---------------------------------------------------------------------
-
--- [[ MODULES ]] --
-local modules = game.ReplicatedStorage.UIHandling
-local preferences = require(modules.UIPreferences)
 
 -- [[ Store button-to-GUI mappings ]] --
 local guiMap = {}
@@ -47,15 +49,15 @@ local function mapGUIToContentsFromButton(gui, button)
 	for _, descendant in gui:GetDescendants() do
 
 		-- // 1. Check for mainframe
-		if descendant.Name:lower() == preferences.naming_rules.mainFrame_name:lower() then 
+		if descendant.Name:lower() == Preferences.naming_rules.mainFrame_name:lower() then 
 			mainframe = descendant
 
 		-- // 2. Check for close button
-		elseif descendant.Name:lower() == preferences.naming_rules.closeButton_name:lower() then 
+		elseif descendant.Name:lower() == Preferences.naming_rules.closeButton_name:lower() then 
 			closebutton = descendant
 
 		-- // 3. Check for associated open prompts
-		elseif descendant.Name:lower() == preferences.naming_rules.associatedOpenPrompts_name:lower() then 
+		elseif descendant.Name:lower() == Preferences.naming_rules.associatedOpenPrompts_name:lower() then 
 			if not descendant:IsA("Folder") then
 				warn("AssociatedOpenPrompts must be a folder")
 				continue
@@ -66,6 +68,17 @@ local function mapGUIToContentsFromButton(gui, button)
 				if not prompt:IsA("ObjectValue") then
 					warn("Only ObjectValues can be stored in AssociatedOpenPrompts")
 					continue
+				end
+				
+				local objValue = prompt -- your ObjectValue instance
+
+				-- Wait until Value is set
+				if not objValue.Value then
+					objValue:GetPropertyChangedSignal("Value"):Wait()
+				end
+
+				if not objValue.Value:IsA("ProximityPrompt") then
+					warn("ObjectValue in AssociatedOpenPrompts must reference a ProximityPrompt")
 				end
 
 				-- Store reference
@@ -107,7 +120,7 @@ end
 -- [[ NORMALIZE UI ON GAME START ]] --
 coroutine.wrap(function()
 	for index, gui in pairs (guiMap) do
-		gui.mainFrame.Position = preferences.UI_closedPosition
+		gui.mainFrame.Position = Preferences.UI_closedPosition
 		gui.mainFrame.Visible = false
 	end
 end)()
@@ -119,13 +132,13 @@ end)()
 local function clearGUIs()
 	for _, gui in pairs(guiMap) do
 		gui.mainFrame.Visible = false
-		gui.mainFrame.Position = preferences.UI_closedPosition
+		gui.mainFrame.Position = Preferences.UI_closedPosition
 	end
 end
 
 
 -- // References
-local tweenPreferences = preferences.tweenPreferences
+local tweenPreferences = Preferences.tweenPreferences
 local openTween = tweenPreferences.openTween
 local closeTween = tweenPreferences.closeTween
 
@@ -136,7 +149,7 @@ local function closeGUI(mainFrame)
 	if closingDebounce then return end
 	closingDebounce = true
 
-	mainFrame:TweenPosition(preferences.UI_closedPosition, closeTween.easingDirection, closeTween.easingStyle, closeTween.time, true)
+	mainFrame:TweenPosition(Preferences.UI_closedPosition, closeTween.easingDirection, closeTween.easingStyle, closeTween.time, true)
 	task.wait(closeTween.time)
 
 	mainFrame.Visible = false
@@ -152,7 +165,7 @@ local function openGUI(mainFrame)
 
 	clearGUIs()
 	mainFrame.Visible = true
-	mainFrame:TweenPosition(preferences.UI_openedPosition, openTween.easingDirection, openTween.easingStyle, openTween.time, true)
+	mainFrame:TweenPosition(Preferences.UI_openedPosition, openTween.easingDirection, openTween.easingStyle, openTween.time, true)
 end
 
 -- // open/close
@@ -169,11 +182,11 @@ for index, gui in pairs (guiMap) do
 	end)
 	
 	openButton.MouseEnter:Connect(function()
-		preferences.buttonHoverFunctions.enter(openButton)
+		AnimationFunctions.open_hoverEnter(openButton)
 	end)
 	
 	openButton.MouseLeave:Connect(function()
-		preferences.buttonHoverFunctions.leave(openButton)
+		AnimationFunctions.open_hoverLeave(openButton)
 	end)
 	
 	-- // 2. Associated Open Prompts
@@ -186,6 +199,14 @@ for index, gui in pairs (guiMap) do
 	-- // 3. Close Button
 	closeButton.MouseButton1Click:Connect(function()
 		closeGUI(mainFrame)
+	end)
+	
+	closeButton.MouseEnter:Connect(function()
+		AnimationFunctions.close_hoverEnter(closeButton)
+	end)
+	
+	closeButton.MouseLeave:Connect(function()
+		AnimationFunctions.close_hoverLeave(closeButton)
 	end)
 	
 end

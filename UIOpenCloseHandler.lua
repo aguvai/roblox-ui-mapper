@@ -44,7 +44,7 @@ for _, holder in ipairs (buttonHolder:GetChildren()) do
 			GUIMap = GUIMapper:getMap()
 		else
 			-- If we can't link a button to a GUI, we handle it differently
-			local handled = SpecialButtonFunctions:handle(button)
+			local handled = SpecialButtonFunctions:handle(button, game.Players.LocalPlayer)
 			if not handled then
 				warn(string.format("No GUI or special action defined for button '%s'", button.Name))
 			end

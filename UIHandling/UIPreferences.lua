@@ -1,11 +1,12 @@
 local UIPreferences = {
+	-- Not case sensitive
 	naming_rules = {
 		closeButton_name = "GUICloseButton",
 		mainFrame_name = "mainFrame",
-		associatedOpenPrompts_name = "associatedOpenPrompts",
+		proximityPrompts_name = "ProximityPrompts",
 	},
 
-	-- tween / positions used by AnimationFunctions
+	-- Tween info / positions used by AnimationFunctions
 	openTween = {
 		time = .3,
 		easingStyle = Enum.EasingStyle.Quart,

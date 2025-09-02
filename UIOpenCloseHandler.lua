@@ -21,7 +21,7 @@ local GUIMapper = require(modules.GUIMapper)
 	* The open button's name must contain the corresponding GUI's name as follows:
 		--> GUI NAME + "OpenButton" (e.g. StoreGUI_OpenButton)
 	* If the GUI can be opened with any proximity prompts in addition to the open button:
-		--> Store references to the prompts in a folder within the ScreenGUI named "AssociatedOpenPrompts"
+		--> Store references to the prompts in a folder within the ScreenGUI named "ProximityPrompts"
 			--> References to proximity prompt objects must be stored in an ObjectValue 
 	
 	* GUIs not following these conventions will be ignored.
@@ -59,12 +59,11 @@ end)()
 
 
 -- [[ OPEN/CLOSE FUNCTIONS ]] --
-
 for index, gui in pairs (GUIMap) do
 	
 	local openButton = gui.openButton
 	local closeButton = gui.closeButton
-	local associatedPrompts = gui.associatedOpenPrompts
+	local proximityPrompts = gui.proximityPrompts
 	local mainFrame = gui.mainFrame
 	
 	-- // 1. Open Button
@@ -80,8 +79,8 @@ for index, gui in pairs (GUIMap) do
 		AnimationFunctions.openButton_hoverLeave(openButton)
 	end)
 	
-	-- // 2. Associated Open Prompts
-	for _, prompt in pairs (gui.associatedOpenPrompts) do
+	-- // 2. ProximityPrompts
+	for _, prompt in pairs (gui.proximityPrompts) do
 		prompt.Triggered:Connect(function()
 			AnimationFunctions.openGUI(mainFrame)
 		end)
@@ -99,5 +98,4 @@ for index, gui in pairs (GUIMap) do
 	closeButton.MouseLeave:Connect(function()
 		AnimationFunctions.closeButton_hoverLeave(closeButton)
 	end)
-	
 end

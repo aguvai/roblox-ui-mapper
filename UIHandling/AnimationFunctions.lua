@@ -1,3 +1,4 @@
+-- [[ MODULES ]] --
 local modules = script.Parent
 local GUIMapper = require(modules.GUIMapper)
 local Preferences = require(modules.UIPreferences)

@@ -21,7 +21,7 @@ function GUIMapper.mapGUIToContentsFromButton(gui, button)
 
 	local mainframe
 	local closebutton
-	local associatedPrompts = {}
+	local proximityPromptsTable = {}
 
 	for _, descendant in gui:GetDescendants() do
 
@@ -33,17 +33,17 @@ function GUIMapper.mapGUIToContentsFromButton(gui, button)
 		elseif descendant.Name:lower() == Preferences.naming_rules.closeButton_name:lower() then 
 			closebutton = descendant
 
-			-- // 3. Check for associated open prompts
-		elseif descendant.Name:lower() == Preferences.naming_rules.associatedOpenPrompts_name:lower() then 
+			-- // 3. Check for proximity prompts
+		elseif descendant.Name:lower() == Preferences.naming_rules.proximityPrompts_name:lower() then 
 			if not descendant:IsA("Folder") then
-				warn("AssociatedOpenPrompts must be a folder")
+				warn("ProximityPrompts must be a folder")
 				continue
 			end
 
 			for _, prompt in ipairs(descendant:GetChildren()) do
 				-- Validate folder contents
 				if not prompt:IsA("ObjectValue") then
-					warn("Only ObjectValues can be stored in AssociatedOpenPrompts")
+					warn("Only ObjectValues can be stored in ProximityPrompts")
 					continue
 				end
 
@@ -55,11 +55,11 @@ function GUIMapper.mapGUIToContentsFromButton(gui, button)
 				end
 
 				if not objValue.Value:IsA("ProximityPrompt") then
-					warn("ObjectValue in AssociatedOpenPrompts must reference a ProximityPrompt")
+					warn("ObjectValue in ProximityPrompts must reference a ProximityPrompt")
 				end
 
 				-- Store reference
-				table.insert(associatedPrompts, prompt.Value)
+				table.insert(proximityPromptsTable, prompt.Value)
 			end
 		end
 
@@ -71,7 +71,7 @@ function GUIMapper.mapGUIToContentsFromButton(gui, button)
 			openButton = button,
 			closeButton = closebutton,
 			mainFrame = mainframe,
-			associatedOpenPrompts = associatedPrompts,
+			proximityPrompts = proximityPromptsTable,
 		}
 	else
 		warn("Missing MainFrame or GUICloseButton in GUI: " .. gui.Name)

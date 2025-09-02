@@ -10,7 +10,7 @@ end
 
 function GUIMapper.mapGUIToContentsFromButton(gui, button)
 
-	if not button:IsA("ImageButton") or not button:IsA("TextButton") then
+	if not (button:IsA("ImageButton") or button:IsA("TextButton")) then
 		for _, v in pairs (button:GetDescendants()) do
 			if v:IsA("ImageButton") or v:IsA("TextButton") then
 				button = v

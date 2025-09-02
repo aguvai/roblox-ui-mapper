@@ -58,49 +58,8 @@ coroutine.wrap(function()
 end)()
 
 
--- [[ OPEN/CLOSE GUI FUNCTIONS ]] --
+-- [[ OPEN/CLOSE FUNCTIONS ]] --
 
--- // Helpers
-local function clearGUIs()
-	for _, gui in pairs(GUIMap) do
-		gui.mainFrame.Visible = false
-		gui.mainFrame.Position = Preferences.UI_closedPosition
-	end
-end
-
-
--- // References
-local tweenPreferences = Preferences.tweenPreferences
-local openTween = tweenPreferences.openTween
-local closeTween = tweenPreferences.closeTween
-
--- // Close function
-local closingDebounce = false
-local function closeGUI(mainFrame)
-	if not mainFrame.Visible then return end
-	if closingDebounce then return end
-	closingDebounce = true
-
-	mainFrame:TweenPosition(Preferences.UI_closedPosition, closeTween.easingDirection, closeTween.easingStyle, closeTween.time, true)
-	task.wait(closeTween.time)
-
-	mainFrame.Visible = false
-	closingDebounce = false
-end
-
--- // Open function
-local function openGUI(mainFrame)
-	if mainFrame.Visible then 
-		closeGUI(mainFrame)
-		return
-	end
-
-	clearGUIs()
-	mainFrame.Visible = true
-	mainFrame:TweenPosition(Preferences.UI_openedPosition, openTween.easingDirection, openTween.easingStyle, openTween.time, true)
-end
-
--- // open/close
 for index, gui in pairs (GUIMap) do
 	
 	local openButton = gui.openButton
@@ -110,35 +69,35 @@ for index, gui in pairs (GUIMap) do
 	
 	-- // 1. Open Button
 	openButton.MouseButton1Click:Connect(function()
-		openGUI(mainFrame)
+		AnimationFunctions.openGUI(mainFrame)
 	end)
 	
 	openButton.MouseEnter:Connect(function()
-		AnimationFunctions.open_hoverEnter(openButton)
+		AnimationFunctions.openButton_hoverEnter(openButton)
 	end)
 	
 	openButton.MouseLeave:Connect(function()
-		AnimationFunctions.open_hoverLeave(openButton)
+		AnimationFunctions.openButton_hoverLeave(openButton)
 	end)
 	
 	-- // 2. Associated Open Prompts
 	for _, prompt in pairs (gui.associatedOpenPrompts) do
 		prompt.Triggered:Connect(function()
-			openGUI(mainFrame)
+			AnimationFunctions.openGUI(mainFrame)
 		end)
 	end
 	
 	-- // 3. Close Button
 	closeButton.MouseButton1Click:Connect(function()
-		closeGUI(mainFrame)
+		AnimationFunctions.closeGUI(mainFrame)
 	end)
 	
 	closeButton.MouseEnter:Connect(function()
-		AnimationFunctions.close_hoverEnter(closeButton)
+		AnimationFunctions.closeButton_hoverEnter(closeButton)
 	end)
 	
 	closeButton.MouseLeave:Connect(function()
-		AnimationFunctions.close_hoverLeave(closeButton)
+		AnimationFunctions.closeButton_hoverLeave(closeButton)
 	end)
 	
 end

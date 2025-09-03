@@ -6,11 +6,13 @@ local playerGUI = script.Parent
 local buttonHolder = playerGUI:WaitForChild("ButtonHolder")
 
 -- [[ MODULES ]] --
-local modules = game.ReplicatedStorage.UIHandling
-local Preferences = require(modules.UIPreferences)
-local AnimationFunctions = require(modules.AnimationFunctions)
-local GUIMapper = require(modules.GUIMapper)
-local SpecialButtonFunctions = require(modules.SpecialButtonFunctions)
+local UIHandler = game.ReplicatedStorage.UIHandling
+local ScreenButtonHandling = UIHandler.ScreenButtonHandling
+
+local Preferences = require(ScreenButtonHandling.UIPreferences)
+local AnimationFunctions = require(ScreenButtonHandling.AnimationFunctions)
+local GUIMapper = require(ScreenButtonHandling.GUIMapper)
+local SpecialButtonFunctions = require(ScreenButtonHandling.SpecialButtonFunctions)
 
 ---------------------------------------------------------------------
 -- [[ SCREENGUI REFERENCES ]] --

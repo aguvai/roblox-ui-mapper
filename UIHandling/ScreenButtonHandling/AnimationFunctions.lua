@@ -59,7 +59,7 @@ local closedPosition = Preferences.UI_closedPosition
 local openedPosition = Preferences.UI_openedPosition
 
 -- [[ HELPERS ]] --
-local function clearGUIs()
+AnimationFunctions.clearGUIs = function()
 	for _, gui in pairs(GUIMapper.getMap()) do
 		gui.mainFrame.Visible = false
 		gui.mainFrame.Position = closedPosition
@@ -87,7 +87,7 @@ AnimationFunctions.openGUI = function(mainFrame)
 		return
 	end
 
-	clearGUIs()
+	AnimationFunctions.clearGUIs()
 	mainFrame.Visible = true
 	mainFrame:TweenPosition(openedPosition, openTween.easingDirection, openTween.easingStyle, openTween.time, true)
 end

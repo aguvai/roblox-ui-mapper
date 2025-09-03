@@ -1,7 +1,7 @@
 -- [[ MODULES ]] --
 local modules = script.Parent
 local GUIMapper = require(modules.GUIMapper)
-local Preferences = require(modules.UIPreferences)
+local Preferences = require(modules.Preferences)
 
 -- [[ SERVICES ]] --
 local TweenService = game:GetService("TweenService")
@@ -52,7 +52,7 @@ end
 
 
 -- [[ OPEN / CLOSE FRAMES ]]
--- pull tween/position preferences from UIPreferences
+-- pull tween/position preferences from Preferences
 local openTween = Preferences.openTween
 local closeTween = Preferences.closeTween
 local closedPosition = Preferences.UI_closedPosition

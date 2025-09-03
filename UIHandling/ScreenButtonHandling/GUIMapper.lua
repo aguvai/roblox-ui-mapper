@@ -1,4 +1,4 @@
-local Preferences = require(script.Parent.UIPreferences)
+local Preferences = require(script.Parent.Preferences)
 
 local GUIMapper = {}
 

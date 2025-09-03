@@ -9,7 +9,7 @@ local buttonHolder = playerGUI:WaitForChild("ButtonHolder")
 local UIHandler = game.ReplicatedStorage.UIHandling
 local ScreenButtonHandling = UIHandler.ScreenButtonHandling
 
-local Preferences = require(ScreenButtonHandling.UIPreferences)
+local Preferences = require(ScreenButtonHandling.Preferences)
 local AnimationFunctions = require(ScreenButtonHandling.AnimationFunctions)
 local GUIMapper = require(ScreenButtonHandling.GUIMapper)
 local SpecialButtonFunctions = require(ScreenButtonHandling.SpecialButtonFunctions)

@@ -1,10 +1,5 @@
 local Preferences = {}
 
-overlayUI = script.OverlayUI
-if not overlayUI.Value then
-	overlayUI:GetPropertyChangedSignal("Value"):Wait()
-end
-
 Preferences.Positions = {
 	top = UDim2.new(0.5, 0, 0, 0),
 	middle = UDim2.new(0.5, 0, 0.5, 0),
@@ -26,6 +21,6 @@ Preferences.Animations = {
 	},
 }
 
-Preferences.OverlayUI = overlayUI
+Preferences.OverlayUIName = "OverlayUI"
 
 return Preferences

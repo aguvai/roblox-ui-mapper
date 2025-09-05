@@ -15,4 +15,16 @@ Preferences.Animations = {
 
 Preferences.OverlayUIName = "OverlayUI"
 
+Preferences.Toast = {
+	secondsOnScreen = 4
+}
+
+Preferences.Modal = {
+	
+}
+
+Preferences.Notification = {
+	secondsOnScreen = 10,
+}
+
 return Preferences

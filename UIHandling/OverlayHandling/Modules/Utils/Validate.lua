@@ -1,6 +1,6 @@
 local Validate = {}
 
-function Validate:ValidatePlayer(player)
+function Validate.ValidatePlayer(player)
 	if typeof(player) ~= "Instance" or not player:IsA("Player") then
 		warn("Expected Player object for player parameter, got " .. typeof(player))
 		return false
@@ -9,7 +9,7 @@ function Validate:ValidatePlayer(player)
 	end
 end
 
-function Validate:ValidateOptions(options, requiredFields)
+function Validate.ValidateOptions(options, requiredFields)
 	if typeof(options) ~= "table" then
 		warn("Expected table for options parameter, got " .. typeof(options))
 		return false
@@ -30,7 +30,7 @@ function Validate:ValidateOptions(options, requiredFields)
 	return true
 end
 
-function Validate:FetchPlayerGUI(player)
+function Validate.FetchPlayerGUI(player)
 	local playergui = player:WaitForChild("PlayerGui", 5)
 
 	if not playergui then

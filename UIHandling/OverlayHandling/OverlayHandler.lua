@@ -15,25 +15,26 @@ local function validate(player, options, requiredFields)
 	return overlayGUI
 end
 
+
 -- [[ * MAIN * ]] --
 local OverlayHandler = {}
 
 function OverlayHandler.showModal(player, options)
-	local overlayGUI = validate(player, options, {"title", "primarytext"})
+	local overlayGUI = validate(player, options, {"title", "primary_text", "button_text", "button_action"})
 	if not overlayGUI then return end
 	
 	modal.show(overlayGUI, options)
 end
 
 function OverlayHandler.showToast(player, options)
-	local overlayGUI = validate(player, options, {"primarytext"})
+	local overlayGUI = validate(player, options, {"primary_text"})
 	if not overlayGUI then return end
 	
 	toast.show(overlayGUI, options)
 end
 
 function OverlayHandler.showNotification(player, options)
-	local overlayGUI = validate(player, options, {"title", "primarytext"})
+	local overlayGUI = validate(player, options, {"title", "primary_text"})
 	if not overlayGUI then return end
 	
 	notification.show(overlayGUI, options)

@@ -41,7 +41,6 @@ function Modal.new(overlayGUI, options)
 	self.gui.Position = UDim2.new(0, 0, -1, 0)
 
 	-- instance state
-	self.tweeningOut = false
 	self.rotationCache = RotationHandler.normalizeRotation(self.gui)
 	self.options = options
 
@@ -53,7 +52,7 @@ function Modal.new(overlayGUI, options)
 	self.gui.Title.Text = options.title
 
 	-- close button
-	self.gui.CloseButton.MouseButton1Click:Connect(function()
+	self.gui.CloseButton.MouseButton1Click:Once(function()
 		self:tweenOut()
 	end)
 
@@ -77,18 +76,16 @@ end
 
 -- Tween out
 function Modal:tweenOut()
-	if self.tweeningOut then return end
-	self.tweeningOut = true
+	RotationHandler.restoreRotation(self.rotationCache, true, (Preferences.Modal.TweenOutSpeed / 2))
 
 	local tween = TweenService:Create(self.gui, TweenInfo.new(Preferences.Modal.TweenOutSpeed, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
 		Position = UDim2.new(0, 0, -1, 0)
 	})
-	tween.Completed:Connect(function()
-		self.gui:Destroy()
-		self.tweeningOut = false
-		RotationHandler.restoreRotation(self.rotationCache, true, Preferences.Modal.TweenOutSpeed - 0.2)
-	end)
 	tween:Play()
+	
+	tween.Completed:Once(function()
+		self.gui:Destroy()
+	end)
 end
 
 -- Build left side

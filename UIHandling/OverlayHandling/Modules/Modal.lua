@@ -4,7 +4,7 @@ local RotationHandler = require(script.Parent.Utils.RotationHandler)
 local TweenService = game:GetService("TweenService")
 local template = script:WaitForChild("ModalTemplate")
 
--- Glow animation
+-- [[ ANIMATION FUNCTIONS ]] --
 local function eminatingGlow(icon)
 	local glow = icon:FindFirstChild("EminatingLight")
 	if not glow then return end
@@ -26,11 +26,11 @@ local function eminatingGlow(icon)
 	end)
 end
 
--- Class table
+
+-- [[ CONSTRUCTOR ]] --
 local Modal = {}
 Modal.__index = Modal
 
--- Constructor
 function Modal.new(overlayGUI, options)
 	local self = setmetatable({}, Modal)
 
@@ -45,8 +45,8 @@ function Modal.new(overlayGUI, options)
 	self.options = options
 
 	-- build UI
-	self:_buildLeftSide()
-	self:_buildRightSide()
+	self:buildLeftSide()
+	self:buildRightSide()
 
 	-- set title
 	self.gui.Title.Text = options.title
@@ -62,23 +62,24 @@ function Modal.new(overlayGUI, options)
 	return self
 end
 
--- Tween in
+-- [[ TWEEN FUNCTIONS ]] --
+-- // Tween in
 function Modal:tweenIn()
-	local tween = TweenService:Create(self.gui, TweenInfo.new(Preferences.Modal.TweenInSpeed, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {
+	local tween = TweenService:Create(self.gui, Preferences.Modal.TweenInInfo, {
 		Position = UDim2.new(0, 0, 0, 0)
 	})
 	tween:Play()
 
-	task.wait((Preferences.Modal.TweenInSpeed) / 2)
+	task.wait((Preferences.Modal.TweenInInfo.Time) / 2)
 	
 	RotationHandler.restoreRotation(self.rotationCache)
 end
 
--- Tween out
+-- // Tween out
 function Modal:tweenOut()
-	RotationHandler.restoreRotation(self.rotationCache, true, (Preferences.Modal.TweenOutSpeed / 2))
+	RotationHandler.restoreRotation(self.rotationCache, true, (Preferences.Modal.TweenOutInfo.Time / 2))
 
-	local tween = TweenService:Create(self.gui, TweenInfo.new(Preferences.Modal.TweenOutSpeed, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {
+	local tween = TweenService:Create(self.gui, Preferences.Modal.TweenOutInfo, {
 		Position = UDim2.new(0, 0, -1, 0)
 	})
 	tween:Play()
@@ -88,8 +89,9 @@ function Modal:tweenOut()
 	end)
 end
 
--- Build left side
-function Modal:_buildLeftSide()
+-- [[ BUILD FUNCTIONS ]] --
+-- // Build left side
+function Modal:buildLeftSide()
 	local leftSide = self.gui.MainFrame.LeftSide
 	local rightSide = self.gui.MainFrame.RightSide
 	local options = self.options
@@ -118,8 +120,8 @@ function Modal:_buildLeftSide()
 	end
 end
 
--- Build right side
-function Modal:_buildRightSide()
+-- // Build right side
+function Modal:buildRightSide()
 	local rightSide = self.gui.MainFrame.RightSide
 	local options = self.options
 

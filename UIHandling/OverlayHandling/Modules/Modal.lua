@@ -106,6 +106,8 @@ function Modal:_buildLeftSide()
 			eminatingGlow(icon)
 
 			icon.IconText.Text = options.icon_text or ""
+		else
+			icon.Visible = false
 		end
 
 		if options.under_icon_text and options.under_icon_text ~= "" then
@@ -131,6 +133,8 @@ function Modal:_buildRightSide()
 	end
 
 	button.Hitbox.MouseButton1Click:Connect(function()
+		
+		--TODO: Figure out if we want to continue to show UI based on function return
 		if options.button_action then
 			options.button_action()
 		end

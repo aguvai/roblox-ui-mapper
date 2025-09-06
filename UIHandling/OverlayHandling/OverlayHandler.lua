@@ -33,7 +33,7 @@ function OverlayHandler.showToast(player, options)
 end
 
 function OverlayHandler.showNotification(player, options)
-	local overlayGUI = validate(player, options, {"title", "primary_text"})
+	local overlayGUI = validate(player, options, {"title", "primary_text", "button_text", "button_action"})
 	if not overlayGUI then return end
 
 	return Notification.new(overlayGUI, options)

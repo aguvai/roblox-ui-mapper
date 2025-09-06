@@ -21,7 +21,14 @@ fields per UI module:
 			- button_strikethrough_text (to show discounts, i.e. "R$ 3000" will appear with a red line through it above the button's main text),
 			- under_icon_text (e.g. "Gain infinite power!") appears under the icon,
 		}
-	toast = {primarytext}
+		
+	toast = {
+		REQUIRED:
+			- primarytext
+		OPTIONAL:
+			- type ("success", "error", "info", "warning") DEFAULT: "info"
+	}
+	
 	notification = {title, primarytext}
 
 --------------------> UTILS for OverlayHandling
@@ -29,7 +36,7 @@ fields per UI module:
 
 ******************* ScreenButtonHandling:
 
-
+Maps screen buttons to their respective GUIs / functions
 
 
 ]]

@@ -5,8 +5,8 @@ Preferences.OverlayUIName = "OverlayUI"
 Preferences.Toast = {
 	secondsOnScreen = 4,
 	
-	TweenInInfo = TweenInfo.new(.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-	TweenOutInfo = TweenInfo.new(.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+	TweenInInfo = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+	TweenOutInfo = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
 }
 
 Preferences.Modal = {

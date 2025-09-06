@@ -23,14 +23,9 @@ fields per UI module:
 		}
 	toast = {primarytext}
 	notification = {title, primarytext}
-	
-optional fields per UI module:
-	
-	modal = {
-		
-		}
 
-
+--------------------> UTILS for OverlayHandling
+	NormalizeRotation: cache and restore rotation of all objects in a container to make tweening appear smoother in UI objects parented to a frame that clips descendants
 
 ******************* ScreenButtonHandling:
 

@@ -4,13 +4,27 @@ local RotationHandler = require(script.Parent.Utils.RotationHandler)
 local TweenService = game:GetService("TweenService")
 local template = script:WaitForChild("ModalTemplate")
 
+-- [[ UTILITY ]] --
+local function cleanup(self)
+	-- Disconnect all event connections
+	for _, conn in ipairs(self.connections) do
+		conn:Disconnect()
+	end
+	self.connections = {}
+
+	-- Destroy GUI
+	if self.gui then
+		self.gui:Destroy()
+	end
+end
+
 -- [[ ANIMATION FUNCTIONS ]] --
 local function eminatingGlow(icon)
-	local glow = icon:FindFirstChild("EminatingLight")
+	local glow = icon.Parent:FindFirstChild("EminatingLight")
 	if not glow then return end
 
 	task.spawn(function()
-		while glow.Parent == icon do
+		while icon.Parent do
 			local tweenIn = TweenService:Create(glow, TweenInfo.new(0.7, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
 				ImageTransparency = 0.95
 			})
@@ -28,55 +42,56 @@ end
 
 -- [[ TWEEN FUNCTIONS ]] --
 -- // Tween in
-local function tweenIn(gui, rotationCache)
-	local tween = TweenService:Create(gui, Preferences.Modal.TweenInInfo, {
+local function tweenIn(self)
+	local tween = TweenService:Create(self.gui, Preferences.Modal.TweenInInfo, {
 		Position = UDim2.new(0, 0, 0, 0)
 	})
 	tween:Play()
 
 	task.wait((Preferences.Modal.TweenInInfo.Time) / 2)
 
-	RotationHandler.restoreRotation(rotationCache)
+	RotationHandler.restoreRotation(self.rotationCache)
 end
 
 -- // Tween out
-local function tweenOut(gui, rotationCache)
-	RotationHandler.restoreRotation(rotationCache, true, (Preferences.Modal.TweenOutInfo.Time / 2))
+local function tweenOut(self)
+	RotationHandler.restoreRotation(self.rotationCache, true, (Preferences.Modal.TweenOutInfo.Time / 2))
 
-	local tween = TweenService:Create(gui, Preferences.Modal.TweenOutInfo, {
+	local tween = TweenService:Create(self.gui, Preferences.Modal.TweenOutInfo, {
 		Position = UDim2.new(0, 0, -1, 0)
 	})
 	tween:Play()
 
 	tween.Completed:Once(function()
-		gui:Destroy()
+		cleanup(self)
 	end)
 end
 
 -- [[ BUILD FUNCTIONS ]] --
 -- // Build left side
-local function buildLeftSide(gui, options)
-	local leftSide = gui.MainFrame.LeftSide
-	local rightSide = gui.MainFrame.RightSide
+local function buildLeftSide(self)
+	local leftSide = self.gui.MainFrame.LeftSide
+	local rightSide = self.gui.MainFrame.RightSide
 
 	local icon = leftSide["1_Icon"].Icon
 	local supplementaltext = leftSide["2_SupplementalTextFrame"].SupplementalText
 
-	if (not options.icon_id or options.icon_id == "") and (not options.under_icon_text or options.under_icon_text == "") then
+	if (not self.options.icon_id or self.options.icon_id == "") and (not self.options.under_icon_text or self.options.under_icon_text == "") then
 		leftSide.Visible = false
 		rightSide.Size = UDim2.new(0.8, 0, 0.9, 0)
 	else
-		if options.icon_id then
-			icon.Image = "rbxassetid://"..options.icon_id
-			eminatingGlow(icon.Parent.EminatingLight)
+		if self.options.icon_id then
+			icon.Image = "rbxassetid://" .. self.options.icon_id
+			eminatingGlow(icon)
 
-			icon.Parent.IconText.Text = options.icon_text or ""
+			icon.Parent.IconText.Text = self.options.icon_text or ""
 		else
-			icon.Visible = false
+			icon.Parent.Visible = false
+			supplementaltext.Size = UDim2.new(1, 0, .75, 0)
 		end
 
-		if options.under_icon_text and options.under_icon_text ~= "" then
-			supplementaltext.Text = options.under_icon_text
+		if self.options.under_icon_text and self.options.under_icon_text ~= "" then
+			supplementaltext.Text = self.options.under_icon_text
 		else
 			supplementaltext.Parent.Visible = false
 		end
@@ -84,26 +99,34 @@ local function buildLeftSide(gui, options)
 end
 
 -- // Build right side
-local function buildRightSide(gui, options, rotationCache)
-	local rightSide = gui.MainFrame.RightSide
+local function buildRightSide(self)
+	local rightSide = self.gui.MainFrame.RightSide
 
-	rightSide["1_PrimaryTextFrame"].MainText.Text = options.primary_text
+	rightSide["1_PrimaryTextFrame"].MainText.Text = self.options.primary_text
 	local button = rightSide["2_ButtonFrame"]
 
-	button.ButtonText.Text = options.button_text
-	button.StrikethroughText.Visible = options.button_strikethrough_text ~= nil and options.button_strikethrough_text ~= ""
+	button.ButtonText.Text = self.options.button_text
+	button.StrikethroughText.Visible = self.options.button_strikethrough_text ~= nil and self.options.button_strikethrough_text ~= ""
 	if button.StrikethroughText.Visible then
-		button.StrikethroughText.Text = options.button_strikethrough_text
+		button.StrikethroughText.Text = self.options.button_strikethrough_text
 	end
 
-	button.Hitbox.MouseButton1Click:Connect(function()
+	table.insert(self.connections, button.Hitbox.MouseButton1Click:Connect(function()
 
 		--TODO: Figure out if we want to continue to show UI based on function return
-		if options.button_action then
-			options.button_action()
+		if self.options.button_action then
+			self.options.button_action()
 		end
-		tweenOut(gui, rotationCache)
-	end)
+		tweenOut(self)
+	end))
+	
+	table.insert(self.connections, button.Hitbox.MouseEnter:Connect(function()
+		button.BackgroundTransparency = .25
+	end))
+	
+	table.insert(self.connections, button.Hitbox.MouseLeave:Connect(function()
+		button.BackgroundTransparency = 0
+	end))
 end
 
 -- [[ CONSTRUCTOR ]] --
@@ -111,32 +134,39 @@ local Modal = {}
 Modal.__index = Modal
 
 function Modal.new(overlayGUI, options)
+	local modalFrame = overlayGUI:WaitForChild("ModalFrame", 5)
+	if not modalFrame then return end
+	-- Prevent multiple modals
+	-- TODO: Shift to queue system
+	if #modalFrame:GetChildren() > 0 then warn("Modal already present. Rejecting request.") return end 
+	
 	local self = setmetatable({}, Modal)
+	self.options = options
+	self.connections = {}
 
-	-- clone template
+	-- Clone template
 	self.gui = template:Clone()
 	self.gui.Parent = overlayGUI:WaitForChild("ModalFrame", 5)
 	self.gui.Visible = true
+	
+	-- Initialize
 	self.gui.Position = UDim2.new(0, 0, -1, 0)
-
-	-- instance state
 	self.rotationCache = RotationHandler.normalizeRotation(self.gui)
-	self.options = options
 
-	-- build UI
-	buildLeftSide(self.gui, self.options)
-	buildRightSide(self.gui, self.options, self.rotationCache)
+	-- Build UI
+	buildLeftSide(self)
+	buildRightSide(self)
 
-	-- set title
+	-- Set title
 	self.gui.Title.Text = options.title
 
-	-- close button
+	-- Close button
 	self.gui.CloseButton.MouseButton1Click:Once(function()
-		tweenOut(self.gui, self.rotationCache)
+		tweenOut(self)
 	end)
 
-	-- animate in
-	tweenIn(self.gui, self.rotationCache)
+	-- Animate in
+	tweenIn(self)
 
 	return self
 end

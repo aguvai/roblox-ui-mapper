@@ -4,7 +4,7 @@ local TweenService = game:GetService("TweenService")
 local template = script:WaitForChild("NotificationTemplate")
 
 -- [[ UTILITY ]] --
-local function cleanupConnections(self)
+local function cleanup(self)
 	-- Disconnect all event connections
 	for _, conn in ipairs(self.connections) do
 		conn:Disconnect()
@@ -28,7 +28,7 @@ local function tweenOut(self)
 	tween:Play()
 
 	tween.Completed:Once(function()
-		cleanupConnections(self)
+		cleanup(self)
 	end)
 end
 
@@ -57,22 +57,28 @@ end
 
 local function buildRightSide(self, gui, options)
 	local rightSide = gui.MainFrame.RightSide
+	
 	local buttonFrame = rightSide.ButtonFrame
 	local buttonText = buttonFrame.ButtonText
 	local hitbox = buttonFrame.Hitbox
 	buttonText.Text = options.button_text
+	
+	local primaryText = rightSide.PrimaryTextFrame.PrimaryText
+	primaryText.Text = options.primary_text
 
-	-- Track connections
+	-- Action button events
 	table.insert(self.connections, hitbox.MouseButton1Click:Connect(function()
 		options.button_action()
 		tweenOut(self)
 	end))
 
-	table.insert(self.connections, hitbox.MouseEnter:Connect(function() end))
-	table.insert(self.connections, hitbox.MouseLeave:Connect(function() end))
-
-	local primaryText = rightSide.PrimaryTextFrame.PrimaryText
-	primaryText.Text = options.primary_text
+	table.insert(self.connections, hitbox.MouseEnter:Connect(function()
+		buttonFrame.BackgroundTransparency = .25
+	end))
+	
+	table.insert(self.connections, hitbox.MouseLeave:Connect(function() 
+		buttonFrame.BackgroundTransparency = 0
+	end))
 end
 
 -- [[ CLASS ]] --
@@ -80,13 +86,17 @@ local Notification = {}
 Notification.__index = Notification
 
 function Notification.new(overlayGUI, options)
+	local notificationFrame = overlayGUI:WaitForChild("NotificationFrame", 5)
+	if not notificationFrame then return end
+	if #notificationFrame:GetChildren() > 1 then warn("Notification already present. Rejecting request.") return end
+	
 	local self = setmetatable({}, Notification)
 	self.options = options
 	self.connections = {}
 
 	-- Clone template
 	self.gui = template:Clone()
-	self.gui.Parent = overlayGUI:WaitForChild("NotificationFrame", 5)
+	self.gui.Parent = notificationFrame
 	self.gui.Position = UDim2.new(1.1, 0, 0, 0)
 
 	-- Build

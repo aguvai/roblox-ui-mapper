@@ -24,15 +24,24 @@ fields per UI module:
 		
 	toast = {
 		REQUIRED:
-			- primarytext
+			- primary_text
 		OPTIONAL:
 			- type ("success", "error", "info", "warning") DEFAULT: "info"
 	}
 	
-	notification = {title, primarytext}
+	notification = {
+		REQUIRED:
+			- title 
+			- primary_text
+			- button_text
+			- button_action
+		OPTIONAL:
+			- icon_id
+			- icon_text
+		}
 
 --------------------> UTILS for OverlayHandling
-	NormalizeRotation: cache and restore rotation of all objects in a container to make tweening appear smoother in UI objects parented to a frame that clips descendants
+	RotationHandler: cache and restore rotation of all objects in a container to make tweening appear smoother in UI objects parented to a frame that clips descendants
 
 ******************* ScreenButtonHandling:
 

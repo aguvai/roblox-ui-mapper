@@ -15,22 +15,6 @@ local GUIMapper = require(ScreenButtonHandling.GUIMapper)
 local SpecialButtonFunctions = require(ScreenButtonHandling.SpecialButtonFunctions)
 
 ---------------------------------------------------------------------
--- [[ SCREENGUI REFERENCES ]] --
-
---[[  INFO: 
-	* All ScreenGUIs linked to an open button must have:
-		--> An immediate "MainFrame" child
-		--> A close button named "GUICloseButton"
-	* The open button's name must contain the corresponding GUI's name as follows:
-		--> GUI NAME + "OpenButton" (e.g. StoreGUI_OpenButton)
-	* If the GUI can be opened with any proximity prompts in addition to the open button:
-		--> Store references to the prompts in a folder within the ScreenGUI named "ProximityPrompts"
-			--> References to proximity prompt objects must be stored in an ObjectValue 
-	
-	* GUIs not following these conventions will be ignored.
-	* Names are not case sensitive
---]]
----------------------------------------------------------------------
 
 -- [[ Store button-to-GUI mappings ]] --
 

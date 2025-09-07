@@ -26,6 +26,85 @@ local function eminatingGlow(icon)
 	end)
 end
 
+-- [[ TWEEN FUNCTIONS ]] --
+-- // Tween in
+local function tweenIn(gui, rotationCache)
+	local tween = TweenService:Create(gui, Preferences.Modal.TweenInInfo, {
+		Position = UDim2.new(0, 0, 0, 0)
+	})
+	tween:Play()
+
+	task.wait((Preferences.Modal.TweenInInfo.Time) / 2)
+
+	RotationHandler.restoreRotation(rotationCache)
+end
+
+-- // Tween out
+local function tweenOut(gui, rotationCache)
+	RotationHandler.restoreRotation(rotationCache, true, (Preferences.Modal.TweenOutInfo.Time / 2))
+
+	local tween = TweenService:Create(gui, Preferences.Modal.TweenOutInfo, {
+		Position = UDim2.new(0, 0, -1, 0)
+	})
+	tween:Play()
+
+	tween.Completed:Once(function()
+		gui:Destroy()
+	end)
+end
+
+-- [[ BUILD FUNCTIONS ]] --
+-- // Build left side
+local function buildLeftSide(gui, options)
+	local leftSide = gui.MainFrame.LeftSide
+	local rightSide = gui.MainFrame.RightSide
+
+	local icon = leftSide["1_Icon"].Icon
+	local supplementaltext = leftSide["2_SupplementalTextFrame"].SupplementalText
+
+	if (not options.icon_id or options.icon_id == "") and (not options.under_icon_text or options.under_icon_text == "") then
+		leftSide.Visible = false
+		rightSide.Size = UDim2.new(0.8, 0, 0.9, 0)
+	else
+		if options.icon_id then
+			icon.Image = "rbxassetid://"..options.icon_id
+			eminatingGlow(icon.Parent.EminatingLight)
+
+			icon.Parent.IconText.Text = options.icon_text or ""
+		else
+			icon.Visible = false
+		end
+
+		if options.under_icon_text and options.under_icon_text ~= "" then
+			supplementaltext.Text = options.under_icon_text
+		else
+			supplementaltext.Parent.Visible = false
+		end
+	end
+end
+
+-- // Build right side
+local function buildRightSide(gui, options, rotationCache)
+	local rightSide = gui.MainFrame.RightSide
+
+	rightSide["1_PrimaryTextFrame"].MainText.Text = options.primary_text
+	local button = rightSide["2_ButtonFrame"]
+
+	button.ButtonText.Text = options.button_text
+	button.StrikethroughText.Visible = options.button_strikethrough_text ~= nil and options.button_strikethrough_text ~= ""
+	if button.StrikethroughText.Visible then
+		button.StrikethroughText.Text = options.button_strikethrough_text
+	end
+
+	button.Hitbox.MouseButton1Click:Connect(function()
+
+		--TODO: Figure out if we want to continue to show UI based on function return
+		if options.button_action then
+			options.button_action()
+		end
+		tweenOut(gui, rotationCache)
+	end)
+end
 
 -- [[ CONSTRUCTOR ]] --
 local Modal = {}
@@ -45,103 +124,21 @@ function Modal.new(overlayGUI, options)
 	self.options = options
 
 	-- build UI
-	self:buildLeftSide()
-	self:buildRightSide()
+	buildLeftSide(self.gui, self.options)
+	buildRightSide(self.gui, self.options, self.rotationCache)
 
 	-- set title
 	self.gui.Title.Text = options.title
 
 	-- close button
 	self.gui.CloseButton.MouseButton1Click:Once(function()
-		self:tweenOut()
+		tweenOut(self.gui, self.rotationCache)
 	end)
 
 	-- animate in
-	self:tweenIn()
+	tweenIn(self.gui, self.rotationCache)
 
 	return self
-end
-
--- [[ TWEEN FUNCTIONS ]] --
--- // Tween in
-function Modal:tweenIn()
-	local tween = TweenService:Create(self.gui, Preferences.Modal.TweenInInfo, {
-		Position = UDim2.new(0, 0, 0, 0)
-	})
-	tween:Play()
-
-	task.wait((Preferences.Modal.TweenInInfo.Time) / 2)
-	
-	RotationHandler.restoreRotation(self.rotationCache)
-end
-
--- // Tween out
-function Modal:tweenOut()
-	RotationHandler.restoreRotation(self.rotationCache, true, (Preferences.Modal.TweenOutInfo.Time / 2))
-
-	local tween = TweenService:Create(self.gui, Preferences.Modal.TweenOutInfo, {
-		Position = UDim2.new(0, 0, -1, 0)
-	})
-	tween:Play()
-	
-	tween.Completed:Once(function()
-		self.gui:Destroy()
-	end)
-end
-
--- [[ BUILD FUNCTIONS ]] --
--- // Build left side
-function Modal:buildLeftSide()
-	local leftSide = self.gui.MainFrame.LeftSide
-	local rightSide = self.gui.MainFrame.RightSide
-	local options = self.options
-
-	local icon = leftSide["1_Icon"]
-	local supplementaltext = leftSide["2_SupplementalTextFrame"].SupplementalText
-
-	if (not options.icon_id or options.icon_id == "") and (not options.under_icon_text or options.under_icon_text == "") then
-		leftSide.Visible = false
-		rightSide.Size = UDim2.new(0.8, 0, 0.9, 0)
-	else
-		if options.icon_id then
-			icon.Image = "rbxassetid://"..options.icon_id
-			eminatingGlow(icon)
-
-			icon.IconText.Text = options.icon_text or ""
-		else
-			icon.Visible = false
-		end
-
-		if options.under_icon_text and options.under_icon_text ~= "" then
-			supplementaltext.Text = options.under_icon_text
-		else
-			supplementaltext.Parent.Visible = false
-		end
-	end
-end
-
--- // Build right side
-function Modal:buildRightSide()
-	local rightSide = self.gui.MainFrame.RightSide
-	local options = self.options
-
-	rightSide["1_PrimaryTextFrame"].MainText.Text = options.primary_text
-	local button = rightSide["2_ButtonFrame"]
-
-	button.ButtonText.Text = options.button_text
-	button.StrikethroughText.Visible = options.button_strikethrough_text ~= nil and options.button_strikethrough_text ~= ""
-	if button.StrikethroughText.Visible then
-		button.StrikethroughText.Text = options.button_strikethrough_text
-	end
-
-	button.Hitbox.MouseButton1Click:Connect(function()
-		
-		--TODO: Figure out if we want to continue to show UI based on function return
-		if options.button_action then
-			options.button_action()
-		end
-		self:tweenOut()
-	end)
 end
 
 return Modal

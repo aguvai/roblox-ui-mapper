@@ -195,3 +195,5 @@ Extending the System
 - To add a special button:
   - Place button in ButtonHolder
   - Register it in SpecialButtonFunctions.actions
+  
+--]]

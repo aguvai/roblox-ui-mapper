@@ -34,7 +34,7 @@ local SpecialButtonFunctions = require(ScreenButtonHandling.SpecialButtonFunctio
 
 -- [[ Store button-to-GUI mappings ]] --
 
-GUIMap = nil
+local GUIMap = nil
 
 for _, holder in ipairs (buttonHolder:GetChildren()) do
 	for _, button in ipairs (holder:GetChildren()) do

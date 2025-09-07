@@ -73,10 +73,10 @@ AnimationFunctions.closeGUI = function(mainFrame)
 	if closingDebounce then return end
 	closingDebounce = true
 
-	mainFrame:TweenPosition(closedPosition, closeTween.easingDirection, closeTween.easingStyle, closeTween.time, true)
-	task.wait(closeTween.time)
-
+	local tween = mainFrame:TweenPosition(closedPosition, closeTween.easingDirection, closeTween.easingStyle, closeTween.time, true)
+	tween.Completed:Wait()
 	mainFrame.Visible = false
+
 	closingDebounce = false
 end
 

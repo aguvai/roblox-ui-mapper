@@ -3,28 +3,6 @@ local Preferences = require(script.Parent.Parent.Preferences)
 local TweenService = game:GetService("TweenService")
 local template = script:WaitForChild("NotificationTemplate")
 
--- [[ BUILD FUNCTIONS ]] -- 
--- // left side
-local function buildLeftSide(leftside, options)
-	leftside.Icon.Image = tonumber(options.icon_id)
-	if options.icon_text ~= nil and options.icon_text ~= "" then
-		leftside.Icon.IconText.Text = options.icon_text
-	end
-end
-
--- // right side
-local function buildRightSide(rightside, options)
-	local buttonFrame = rightside.ButtonFrame
-	local buttonText = buttonFrame.ButtonText
-	local hitbox = buttonFrame.Hitbox
-	buttonText.Text = options.button_text
-	hitbox.MouseButton1Click:Once(options.button_action)
-	
-	local primaryText = rightside.PrimaryTextFrame.PrimaryText
-	primaryText.Text = options.primary_text
-end
-
-
 -- [[ TWEEN FUNCTIONS ]] --
 -- // Tween out
 function tweenOut(gui)
@@ -52,6 +30,34 @@ local function tweenIn(gui)
 	end)
 end
 
+-- [[ BUILD FUNCTIONS ]] -- 
+-- // left side
+local function buildLeftSide(gui, options)
+	local leftSide = gui.MainFrame.LeftSide
+	
+	leftSide.Icon.Image = tonumber(options.icon_id)
+	if options.icon_text ~= nil and options.icon_text ~= "" then
+		leftSide.Icon.IconText.Text = options.icon_text
+	end
+end
+
+-- // right side
+local function buildRightSide(gui, options)
+	local rightSide = gui.MainFrame.RightSide
+	
+	local buttonFrame = rightSide.ButtonFrame
+	local buttonText = buttonFrame.ButtonText
+	local hitbox = buttonFrame.Hitbox
+	buttonText.Text = options.button_text
+	hitbox.MouseButton1Click:Connect(function()
+		options.button_action()
+		tweenOut(gui)	
+	end)
+	
+	local primaryText = rightSide.PrimaryTextFrame.PrimaryText
+	primaryText.Text = options.primary_text
+end
+
 
 
 local Notification = {}
@@ -70,13 +76,13 @@ function Notification.new(overlayGUI, options)
 	self.gui.Title.Text = options.title
 	
 	if options.icon_id ~= nil and options.icon_id ~= "" then
-		buildLeftSide(self.gui.MainFrame.LeftSide, self.options)
+		buildLeftSide(self.gui, self.options)
 	else
 		self.gui.MainFrame.LeftSide.Visible = false
 		self.gui.MainFrame.RightSide.Size = UDim2.new(.9, 0, .8, 0)
 	end
 	
-	buildRightSide(self.gui.MainFrame.RightSide, self.options)
+	buildRightSide(self.gui, self.options)
 
 	-- animate in
 	tweenIn(self.gui)

@@ -22,22 +22,18 @@ end
 local function eminatingGlow(icon)
 	local glow = icon.Parent:FindFirstChild("EminatingLight")
 	if not glow then return end
+	
+	local tween = TweenService:Create(glow, TweenInfo.new(
+		0.75, 
+		Enum.EasingStyle.Linear, 
+		Enum.EasingDirection.InOut, 
+		-1,   -- repeat forever
+		true  -- reverse back and forth
+		), {
+			ImageTransparency = 0.95
+		})
 
-	task.spawn(function()
-		while icon.Parent do
-			local tweenIn = TweenService:Create(glow, TweenInfo.new(0.7, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
-				ImageTransparency = 0.95
-			})
-			tweenIn:Play()
-			tweenIn.Completed:Wait()
-
-			local tweenOut = TweenService:Create(glow, TweenInfo.new(0.7, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {
-				ImageTransparency = 0.98
-			})
-			tweenOut:Play()
-			tweenOut.Completed:Wait()
-		end
-	end)
+	tween:Play()
 end
 
 -- [[ TWEEN FUNCTIONS ]] --
@@ -146,7 +142,7 @@ function Modal.new(overlayGUI, options)
 
 	-- Clone template
 	self.gui = template:Clone()
-	self.gui.Parent = overlayGUI:WaitForChild("ModalFrame", 5)
+	self.gui.Parent = modalFrame
 	self.gui.Visible = true
 	
 	-- Initialize

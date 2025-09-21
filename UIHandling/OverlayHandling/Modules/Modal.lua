@@ -3,6 +3,7 @@ local RotationHandler = require(script.Parent.Utils.RotationHandler)
 
 local TweenService = game:GetService("TweenService")
 local template = script:WaitForChild("ModalTemplate")
+template.Position = UDim2.new(0, 0, -1, 0)
 
 -- [[ UTILITY ]] --
 local function cleanup(self)

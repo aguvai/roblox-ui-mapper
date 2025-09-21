@@ -9,6 +9,9 @@ local Preferences = require(script.Parent.Parent.Preferences)
 
 local TweenService = game:GetService("TweenService")
 local template = script:WaitForChild("ToastTemplate")
+template.BackgroundTransparency = 1
+template["2_Message"].TextTransparency = 1
+template["1_Title"].TextTransparency = 1
 
 local typeColors = {
 	["success"] = Color3.fromRGB(165, 217, 175),
